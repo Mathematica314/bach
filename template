@@ -1,0 +1,15 @@
+#(ly:set-option 'crop #t)
+\new PianoStaff <<
+	\new Staff <<
+		\new Voice = "first"
+			{ \voiceOne [s]}
+		\new Voice = "second"
+			{ \voiceTwo [a]}
+	>>
+	\new Staff <<
+		\new Voice = "first"
+			{\clef bass \voiceOne [t]}
+		\new Voice = "second"
+			{\clef bass \voiceTwo [b]}
+	>>
+>>
