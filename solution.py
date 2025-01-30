@@ -9,7 +9,6 @@ class Solution:
         self.doubled = doubled
         self.harmony = harmony
         self.key = key
-        self.inversion = self.harmony.cast(self.key).index(self.notes[3].octaveless)
     def __repr__(self):
         return str(self.doubled) + " " + self.notes.__repr__() + " " + self.harmony.__repr__()
     def nextscore(self, next):
@@ -43,7 +42,7 @@ class Solution:
         if self.harmony.inversion == 2 and self.doubled != 2:
             self.score -= 10**5
         # Do not double the 5th in other chords
-        if self.inversion != 2 and self.doubled == 2:
+        if self.harmony.inversion != 2 and self.doubled == 2:
             self.score -= 10**5
         # In chords iib and viio the 3rd must be doubled
         if self.harmony == Harmony.fromString("iib") or self.harmony == Harmony.fromString("viio") and self.doubled != 1:
@@ -79,9 +78,6 @@ class Solution:
         for index, note in enumerate(self.notes):
             self.score-= abs((PREFERRED[index]-note).st()) * 5
 
-        # DO NOT YET USE 6/4 CHORDS - NOT YET IMPLEMENTED!
-        if self.inversion == 2:
-            self.score -= 10**10
-        # CURRENTLY PREFER ROOT POSITION OVER FIRST INVERSION - TO BE CHANGED LATER
-        if self.inversion == 1:
+        # Prefer root position over first inversion
+        if self.harmony.inversion == 1:
             self.score -= 40

@@ -1,5 +1,5 @@
 from note import Note as N
-import csv, itertools, networkx, subprocess, pygame
+import csv, itertools, networkx, subprocess, pygame, copy
 from chorale import Chorale
 from solution import Solution
 from consts import VRANGE, MAJOR_INTERVALS
@@ -22,6 +22,7 @@ with open("chorale.bach") as file:
 chorale.validate()
 solutions = []
 
+
 chordnum = 0
 
 for chord in chorale.getchords():
@@ -37,21 +38,31 @@ for chord in chorale.getchords():
                 break
     for doub_in,notes in enumerate(doublings):
         for perm in itertools.permutations([i for i,j in enumerate(chord.c) if j is None]):
-            ch = chord.c.copy()
-            octave_solutions = []
-            for i,part in enumerate(perm):
-                part_octave_solutions = []
-                ch[part] = notes[i]
-                for octave in range(*OCTAVE_TRIAL_RANGE):
-                    if VRANGE[part][0] <= N(notes[i].p,notes[i].a,octave) <= VRANGE[part][1]:
-                        part_octave_solutions.append((part,N(notes[i].p,notes[i].a,octave)))
-                octave_solutions.append(part_octave_solutions)
-            for solution in itertools.product(*octave_solutions):
-                ch_oct = ch.copy()
-                for note in solution:
-                    ch_oct[note[0]] = note[1]
-                if sorted(ch_oct)[::-1] == ch_oct:
-                    sol = Solution(ch_oct,doub_in,chord.h,chorale.scale)
+            # Inversion checking
+            legal = True
+            if 3 in perm:
+                inv = chord.h.cast(chorale.scale).index(notes[-1])
+                if chord.h.inversion == -1 and not (inv == 0 or inv == 1):
+                    legal = False
+                if chord.h.inversion != -1 and chord.h.inversion != inv:
+                    legal = False
+            if legal:
+                ch = chord.c.copy()
+                octave_solutions = []
+                for i,part in enumerate(perm):
+                    part_octave_solutions = []
+                    ch[part] = notes[i]
+                    for octave in range(*OCTAVE_TRIAL_RANGE):
+                        if VRANGE[part][0] <= N(notes[i].p,notes[i].a,octave) <= VRANGE[part][1]:
+                            part_octave_solutions.append((part,N(notes[i].p,notes[i].a,octave)))
+                    octave_solutions.append(part_octave_solutions)
+                for solution in itertools.product(*octave_solutions):
+                    ch_oct = ch.copy()
+                    for note in solution:
+                        ch_oct[note[0]] = note[1]
+                    hrm = copy.deepcopy(chord.h)
+                    hrm.inversion = hrm.cast(chorale.scale).index(ch_oct[3].octaveless)
+                    sol = Solution(ch_oct,doub_in,hrm,chorale.scale)
                     sol.calc_score()
                     row_solutions.append(sol)
     solutions.append(row_solutions)
@@ -91,7 +102,6 @@ print("PATH CALCULATED")
 out_rows = [[] for i in range(4)]
 for index,node in enumerate(path[1:-1]):
     chorale.updatechordat(node.notes, index)
-    print(node.inversion)
     row = [x.lily() for x in node.notes]
     for index,note in enumerate(row):
         out_rows[index].append(note)

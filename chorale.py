@@ -5,11 +5,13 @@ from scale import Scale
 from harmony import Harmony
 
 class ChordHarmonyWrapper:
-    def __init__(self, chord, harmony):
+    def __init__(self, chord, harmony, key):
         self.chord = chord
         self.c = self.chord
         self.harmony = harmony
         self.h = self.harmony
+        self.key = key
+
 
 class Chorale:
     def __init__(self, s=None, a=None, t=None, b=None, harmony=None, tonic=N("c"),intervals=MAJOR_INTERVALS):
@@ -47,7 +49,7 @@ class Chorale:
                 chord.append(None)
             else:
                 chord.append(part[position])
-        return ChordHarmonyWrapper(chord,self.harmony[position])
+        return ChordHarmonyWrapper(chord,self.harmony[position],self.scale)
 
     def getchords(self):
         return [self.chordat(x) for x in range(max([len(i) for i in self.parts]))]

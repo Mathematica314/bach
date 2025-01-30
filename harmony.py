@@ -32,9 +32,10 @@ class Harmony:
     @classmethod
     def fromString(cls,string):
         seventh = False
-        inversion = 0
+        inversion = -1
         if "a" in string:
             string = string.replace("a","")
+            inversion = 0
         if "b" in string:
             string = string.replace("b","")
             inversion = 1
