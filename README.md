@@ -1,5 +1,5 @@
 # bach.py
-Tries to harmonise melodies in the style of J.S. Bach - and sometimes they sound OK!/
+Tries to harmonise melodies in the style of J.S. Bach - and sometimes they sound OK!\
 Please note that this is currently in beta.
 #### The .bach file format
 Key\
